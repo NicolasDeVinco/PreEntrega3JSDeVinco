@@ -13,6 +13,7 @@ const productos = [
     {id: 9, nombre: "Bombilla de madera", categoria: "Bombillas", stock: 10, precio: 1100, imagen: "./images/bombilla_madera.jpg"}
 ]
 
+
 /* ARRAY ACTUALIZADO*/
 
 class Agregados {
@@ -152,10 +153,11 @@ function comprar (event) {
     let producto = productos.find(producto => productoId === producto.id)
 
     if (producto && producto.stock > 0 ) {
-        let productoEnCarrito = carrito.find(producto => productoId === producto.id)
+      let productoEnCarrito = carrito.find(producto => parseInt(productoId) === producto.id)
 
         if (productoEnCarrito) {
             productoEnCarrito.cantidad++
+            
         }
         else {
             productoEnCarrito = {
@@ -167,10 +169,12 @@ function comprar (event) {
                 cantidad: 1
             }
             carrito.push(productoEnCarrito)
-      
+            sessionStorage.setItem(claveProducto(producto), JSON.stringify(`Producto: ${producto.nombre} - Cantidad: ${productoEnCarrito.cantidad} - Precio: ${producto.precio}`))
             
+           
         }
         producto.stock--
+        
 
         mostrarCarrito()
         let resultadoCategoria = productos.filter(
@@ -178,12 +182,34 @@ function comprar (event) {
 
           /*Ternario */
         categoriaActual !== "todos" ? empaquetar(resultadoCategoria) :  empaquetar(productos)
-        
+
+        Toastify({
+          text: "Producto agregado al carrito",
+          close: true,
+          duration: 3000,
+          stopOnFocus: true,
+          style: {
+            background: "linear-gradient(to right, #bbbaba, #358bf9)",
+          },
+          }).showToast()
     }
     else {
-        alert("No hay mas stock")
+      Swal.fire(
+        'No hay mas stock',
+        'Lo siento, no contamos con stock de producto',
+        'warning'
+      )
     }
 }
+
+
+/* GENERA CLAVE EN LOCALSTORAGE */
+
+function claveProducto(producto) {
+  return `producto_${producto.id}`
+}
+
+
 
 
 /* MOSTRAR CARRITO */
@@ -198,11 +224,10 @@ function mostrarCarrito() {
       
       let contenedorProducto = document.createElement("div")
       contenedorProducto.innerHTML = `<p>${producto.nombre}</p> <p>${producto.cantidad}</p> <p>$${producto.precio}</p><img src="./images/equis.png" class="eliminar-producto">`
-  
-      localStorage.setItem('producto', `${producto.nombre}`)
-      localStorage.setItem('cantidad', `${producto.cantidad}`)
-      localStorage.setItem('precio', `${producto.precio}`)
 
+    
+      
+         
 
       contenedorProducto.className = "carrito__producto"
       carritoContainer.appendChild(contenedorProducto)
@@ -227,9 +252,21 @@ function mostrarCarrito() {
     
     let productoOriginal = productos.find(p => p.id === productoEliminado.id)
     productoOriginal.stock += productoEliminado.cantidad
+
+    sessionStorage.removeItem(claveProducto(productoEliminado))
   
     mostrarCarrito()
     empaquetar(productos)
+
+    Toastify({
+      text: "Producto eliminado",
+      close: true,
+      duration: 3000,
+      stopOnFocus: true,
+      style: {
+        background: "linear-gradient(to right, #c18a8a, #fb0000)",
+      },
+      }).showToast()
   }
 
 
@@ -290,10 +327,10 @@ function mostrarCarrito() {
       contrasena: contrasenaUsuario
     }
 
-    localStorage.setItem('nombre', nombreUsuario)
-    localStorage.setItem('apellido', apellidoUsuario)
-    localStorage.setItem('mail', mailUsuario)
-    localStorage.setItem('contrasena', contrasenaUsuario)
+    sessionStorage.setItem('nombre', nombreUsuario)
+    sessionStorage.setItem('apellido', apellidoUsuario)
+    sessionStorage.setItem('mail', mailUsuario)
+    sessionStorage.setItem('contrasena', contrasenaUsuario)
   
     let bienvenida = document.createElement("div")
     bienvenida.innerHTML = "Hola " + nombreUsuario + `<p id="cerrar__sesion">Cerrar Sesion</p>`
@@ -307,21 +344,13 @@ function mostrarCarrito() {
     document.body.removeChild(logueoContainer)
 
     let cerrarSesion = document.getElementById("cerrar__sesion")
-    cerrarSesion.addEventListener("click", desloguear)
+    cerrarSesion.addEventListener("click", function() {
+      sessionStorage.clear()
+      location.reload()
+    }
+    )
     
   }
-
-  window.addEventListener('beforeunload', function() {
-    localStorage.clear()
-  })
-
-  
-/* CERRAR SESION */
-
-function desloguear () {
-  localStorage.clear()
-  location.reload()
-}
 
 
 
@@ -336,14 +365,18 @@ botonPagar.addEventListener("click", function(event) {
 
 function pagar() {  
 
-  if (localStorage.getItem('nombre')) {
+  if (sessionStorage.getItem('nombre')) {
     if (carrito.length === 0) {
-      alert("No hay productos en el carrito")
+      Swal.fire(
+        'Tu carrito está vacio',
+        'Primero agrega productos a tu carrito',
+        'error'
+      )
     } else {
       let contenedorCompra = document.createElement("div")
       contenedorCompra.classList.add("contenedor__compra")
       let megaContainer = document.getElementById("mega__container")
-    megaContainer.classList.add("mega__container")
+      megaContainer.classList.add("mega__container")
       contenedorCompra.innerHTML = "<h2>Estás por comprar:</h2>"
 
       let total = 0
@@ -361,7 +394,22 @@ function pagar() {
 
       document.body.appendChild(contenedorCompra)
       let pagoFinal = document.getElementById("pago__final")
-      pagoFinal.addEventListener("click", autorizado)
+      pagoFinal.addEventListener("click", function() {
+        let contenedorCompra = document.querySelector(".contenedor__compra")
+        document.body.removeChild(contenedorCompra)
+    
+    
+        Swal.fire({
+          icon: 'success',
+          title:'GRACIAS POR TU COMPRA',  
+          text:'Tu pago se ha realizado con éxito',
+          
+        }
+        ).then((result)=> {
+          sessionStorage.clear()
+          location.reload()
+        })
+      })
       
 
       let equisPago = contenedorCompra.querySelector("#equis__pago")
@@ -378,32 +426,7 @@ function pagar() {
 }
 
 
-/* AGRADECER COMPRA */
 
-function autorizado () {
-    let contenedorGracias = document.createElement("div")
-    contenedorGracias.innerHTML = `<h2>GRACIAS POR TU COMPRA</h2>
-                                    <p class="parrafo__codigo>Tu código de referencia es "</p>
-                                    <button id="salir__button">Salir</button>`
-    
-    contenedorGracias.classList.add("contenedor__gracias")                                
-    document.body.appendChild(contenedorGracias)
-    let contenedorCompra = document.querySelector(".contenedor__compra")
-    document.body.removeChild(contenedorCompra)
-
-    let botonSalir = document.getElementById("salir__button")
-    botonSalir.addEventListener("click", salir)
-}
-
-
-/*  SALIR */
-
-function salir () {
-  localStorage.clear()
-  location.reload()
-}
-
- 
 
 
 

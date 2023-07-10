@@ -37,18 +37,21 @@ body {
 .filtros__orden {
     display: grid;
     grid-template-columns: 2fr 5fr 1.5fr 2fr 1fr 0.5fr;
+    margin-bottom: 40px;
 }
 
 .filtro__title {
     color: rgb(119, 115, 115);
     text-align: center;
+    align-self: center;
+    font-size: 16px;
 }
 
 .categorias__container {
-    align-self: center;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
+    font-size: 14px;
 }
 
 .botones__categoria {
@@ -71,18 +74,28 @@ body {
 }
 
 .orden__title {
-    color: rgb(119, 115, 115);  
+    color: rgb(119, 115, 115);
     text-align: center;
+    align-self: center;
+    font-size: 16px;
 }
 
 .select__container {
     border-radius: 10px;
 }
 
+.busqueda__title {
+    color: rgb(119, 115, 115);  
+    text-align: center;
+    align-self: center;
+    font-size: 16px;
+}
+
 #busqueda__input {
     align-self: center;
     border-radius: 10px;
-    height: 20px;
+    height: 25px;
+    margin-right: 10px;
 }
 
 #productos__title {
@@ -117,7 +130,8 @@ body {
 }
 
 .titulo__producto {
-    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 15px;
 }
 
 .imagen__producto {
@@ -132,6 +146,7 @@ body {
     cursor: pointer;
     box-shadow: 3px 2px 2px rgb(199, 207, 209);
     border: 1px solid rgb(117, 117, 117);
+    margin-bottom: 10px;
 }
 
 #button__producto:hover {
@@ -143,11 +158,12 @@ body {
     border: 2px solid black;
     border-radius: 20px;
     width: 90%;
-    height: 570px;
+    height: 500px;
 }
 
 .container__carrito h2 {
     text-align: center;
+    margin-top: 10px;
 }
 
 .carrito__indices {
@@ -183,6 +199,7 @@ body {
 #parrafo__total {
     font-weight: bold;
     font-size: 20px;
+    margin-top: 10px;
 }
 
 .eliminar-producto {
@@ -232,6 +249,7 @@ body {
 
 .logueo__container h2 {
     margin-bottom: 40px;
+    margin-top: 10px;
 }
 
 #form__ingreso {
@@ -292,9 +310,13 @@ border: 2px solid rgb(117, 117, 117);
 padding-bottom: 10px;
 }
 
+
+
+
 .contenedor__compra h2 {
     text-align: center;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .contenedor__compra p {
